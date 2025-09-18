@@ -1,153 +1,203 @@
-# Crypto CTF — *mistake*
+# Crypto CTF Challenge: "mistake" - Write-up
 
-> “We all make mistakes. It’s important to learn from them.”
+## 📋 Challenge Overview
 
-This challenge hides a message inside **LWE** (*Learning With Errors*) samples — but with a design flaw that lets us recover the plaintext **without knowing the secret**. 👀
+**Challenge Name:** mistake  
+**Category:** Cryptography  
+**Description:** "We all make mistakes. It's important to learn from them."
 
----
-
-## 🧩 Challenge Files
-
-You’re given a JSON file `mistake.txt` containing:
-
-- a matrix \(A\) of size \(m \times n\),
-- a vector \(b\) of size \(m\),
-- metadata `meta` including \(q = 3329\), \(n = 128\), \(m = 808\), \(L = 552\), etc.
-
-The hint “mistakes / learn from them” points straight at **LWE** (we “learn” from “errors”).
+This challenge involves a cryptographic scheme based on **Learning With Errors (LWE)** that contains a critical design flaw, allowing us to recover the hidden message without knowing the secret key.
 
 ---
 
-## 🎯 Flag (spoiler)
+## 📁 Challenge Files
 
-**`ctf{4d60c9fe15eed366b65e6fd1111d82c83b11e5dcec7975df4b9700d210e70f92}`**
+The challenge provides a JSON file `mistake.txt` containing:
 
-If you want to reproduce it yourself, follow the steps below. The solver script is included.
-
----
-
-## 🔬 Quick Observations
-
-1) **Tiny coefficients in \(A\)**  
-Entries of \(A\) lie in \(\{0,1,\dots,5,3324,\dots,3328\}\), i.e., in the range \([-5,5]\) when reduced mod \(q=3329\) (since \(3324 \equiv -5 \pmod{3329}\), etc.).  
-That’s unusually **small** for a robust inner product.
-
-2) **Two clear levels in \(b\)**  
-Each \(b_i\) sits noticeably close to either \(0\) or \(q/4 \approx 832.25\); we do **not** see values clustering near \(q/2\) or \(3q/4\).  
-This strongly suggests a **binary** message \(m_i \in \{0,1\}\) encoded by adding \(q/4\) when the bit is 1.
-
-3) **Noise window is tiny**  
-The term \(\langle a_i, s\rangle + e_i\) stays within a very small window (tens at most), which is **far** smaller than the half-gap \((q/4)/2 \approx 416\).  
-Consequence: we can **classify each \(b_i\)** as “close to 0” (bit 0) or “close to \(q/4\)” (bit 1) **without the secret**.  
-That’s the *mistake* we exploit.
+- Matrix **A** of dimensions `m × n`
+- Vector **b** of size `m`
+- Metadata including various parameters:
+  - `q = 3329` (modulus)
+  - `n = 128` (secret dimension)
+  - `m = 808` (number of samples)
+  - `L = 552` (message length in bits)
 
 ---
 
-## 🧠 (Very) Brief LWE Reminder
+## 🔍 Initial Analysis
 
-Each line follows, modulo \(q\):
+### Understanding LWE
 
-\[
-b_i \equiv \langle a_i, s \rangle + e_i + m_i \cdot \frac{q}{4}.
-\]
+Learning With Errors (LWE) is a cryptographic problem where each sample follows the equation:
 
-With small noise \(e_i\), the \(q/4\) offset for bit 1 should remain much larger than the uncertainty from \(\langle a_i,s\rangle + e_i\).  
-Here, the “LWE part” is **so small** that we can ignore \(A\) and \(s\), and read bits directly from \(b\).
+```
+b_i ≡ ⟨a_i, s⟩ + e_i + m_i · (q/4) (mod q)
+```
+
+Where:
+
+- `a_i` is a row vector from matrix A
+- `s` is the secret vector
+- `e_i` is a small error term
+- `m_i` is the message bit (0 or 1)
+- The term `q/4` is added when the message bit is 1
+
+### Key Observations
+
+1. **Unusually Small Coefficients in A**
+
+   - Matrix entries are constrained to `{0,1,2,3,4,5,3324,3325,3326,3327,3328}`
+   - When reduced modulo q=3329, these represent the range `[-5, 5]`
+   - This is extremely small for a secure LWE implementation
+
+2. **Binary Clustering in Vector b**
+
+   - Values in `b` cluster around two distinct levels:
+     - Near `0` (representing message bit 0)
+     - Near `q/4 ≈ 832.25` (representing message bit 1)
+   - No values appear near `q/2` or `3q/4`
+
+3. **Minimal Noise Window**
+   - The combined effect of `⟨a_i, s⟩ + e_i` is very small
+   - Much smaller than the separation `q/4`
+   - This allows classification without knowing the secret!
 
 ---
 
-## 🛠️ Attack Plan
+## 🎯 The Vulnerability
 
-1. **Parse** the JSON to get \(b\) and \(q=3329\).  
-2. For each \(b_i\), compare the **cyclic distance** to \(0\) and to \(q/4\).  
-   - nearer to \(0\) ⇒ \(m_i = 0\)  
-   - nearer to \(q/4\) ⇒ \(m_i = 1\)  
-   (Note: values near \(q\) may actually be “near 0” modulo \(q\).)
-3. **Take the first \(L = 552\) bits** (from metadata `L`).  
-4. **Pack bits into bytes** using **little-endian per byte** (first bit read = LSB).  
-5. **Decode as UTF-8** → you get the message/flag.
+The "mistake" in this implementation is that the noise and secret contribution is so small compared to the message encoding offset (`q/4`) that we can directly classify each `b_i` value as either:
+
+- **Close to 0** → message bit = 0
+- **Close to q/4** → message bit = 1
+
+This completely bypasses the security of the LWE problem.
 
 ---
 
-## 📦 Reproducible Solver
+## 🔧 Solution Strategy
 
-Save this as `solve.py` next to `mistake.txt`:
+1. **Parse the Data Structure**
+
+   - Extract vector `b` and parameters from JSON
+   - Focus on `q`, `L` (message length)
+
+2. **Implement Distance-Based Classification**
+
+   - For each `b_i`, calculate cyclic distance to both 0 and `q/4`
+   - Choose the closer target as the decoded bit
+
+3. **Handle Modular Arithmetic**
+
+   - Account for wraparound: values near `q` may actually be close to 0
+   - Use minimum cyclic distance calculation
+
+4. **Bit Extraction and Packing**
+   - Extract first `L = 552` bits
+   - Pack into bytes using little-endian bit order
+   - Decode as UTF-8 text
+
+---
+
+## 💻 Implementation
 
 ```python
 import json
 
-with open("mistake.txt", "r", encoding="utf-8") as f:
-    data = json.load(f)
+def solve_lwe_mistake(filename):
+    """
+    Solve the LWE mistake challenge by exploiting the small noise.
+    """
+    # Load challenge data
+    with open(filename, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-b = data["b"]
-q = data["meta"]["q"]   # 3329
-L = data["meta"]["L"]   # 552
-step = q / 4.0          # 832.25
+    b = data["b"]
+    q = data["meta"]["q"]   # 3329
+    L = data["meta"]["L"]   # 552 bits
+    step = q / 4.0          # ~832.25
 
-def bit_from_b(bi):
-    """Return 0 or 1 depending on whether bi is closer (mod q) to 0 or q/4."""
-    # cyclic distance to 0
-    d0 = min(abs(bi - 0), q - abs(bi - 0))
-    # cyclic distance to q/4
-    d1 = min(abs(bi - step), q - abs(bi - step))
-    return 0 if d0 <= d1 else 1
+    def classify_bit(bi):
+        """
+        Classify a b_i value as 0 or 1 based on proximity to 0 or q/4.
+        Uses cyclic distance to handle modular arithmetic correctly.
+        """
+        # Cyclic distance to 0
+        dist_to_zero = min(abs(bi - 0), q - abs(bi - 0))
 
-bits = [bit_from_b(int(x)) for x in b][:L]
+        # Cyclic distance to q/4
+        dist_to_quarter = min(abs(bi - step), q - abs(bi - step))
 
-# pack bits little-endian per byte (first bit read -> LSB)
-out = bytearray()
-for i in range(0, len(bits), 8):
-    byte = 0
-    for j in range(8):
-        if i + j < len(bits):
-            byte |= (bits[i + j] << j)
-    out.append(byte)
+        return 0 if dist_to_zero <= dist_to_quarter else 1
 
-print(out.decode("utf-8"))
+    # Extract message bits
+    message_bits = []
+    for i in range(L):
+        bit = classify_bit(int(b[i]))
+        message_bits.append(bit)
+
+    # Pack bits into bytes (little-endian per byte)
+    message_bytes = bytearray()
+    for i in range(0, len(message_bits), 8):
+        byte_value = 0
+        for j in range(8):
+            if i + j < len(message_bits):
+                byte_value |= (message_bits[i + j] << j)
+        message_bytes.append(byte_value)
+
+    # Decode as UTF-8
+    return message_bytes.decode("utf-8")
+
+if __name__ == "__main__":
+    result = solve_lwe_mistake("mistake.txt")
+    print(f"Recovered message: {result}")
 ```
 
-Run:
+---
 
-```bash
-python3 solve.py
-```
+## 🏃 Execution Steps
+
+1. Save the solver script as `solve.py`
+2. Place `mistake.txt` in the same directory
+3. Run: `python3 solve.py`
+4. The script will output the recovered flag
 
 ---
 
-## ✅ Expected Output
+## 🛡️ Security Analysis
 
-```
-ctf{4d60c9fe15eed366b65e6fd1111d82c83b11e5dcec7975df4b9700d210e70f92}
-```
+### Why This Attack Works
 
-> **Flag:** `ctf{4d60c9fe15eed366b65e6fd1111d82c83b11e5dcec7975df4b9700d210e70f92}`
+- **Insufficient Noise**: The error terms are too small relative to the message encoding
+- **Poor Parameter Selection**: Matrix coefficients bounded to `[-5,5]` provide minimal security
+- **Clear Signal Separation**: The `q/4` offset creates easily distinguishable clusters
 
----
+### Proper LWE Implementation Should Include
 
-## 🧱 Why This Works
-
-- Entries of \(A\) are **bounded in \([-5,5]\)** modulo \(q\).  
-- The combined effect of the inner product + noise is **tiny** compared to the \(q/4\) offset.  
-- The binary decision (0 vs \(q/4\)) is therefore **robust** without knowing the secret.  
-- Net result: a **structural leakage** that collapses the scheme to a simple nearest-center classifier.
+1. **Larger Error Distribution**: Noise should be significant compared to signal separation
+2. **Wider Coefficient Range**: Matrix entries should span a larger portion of the modulus space
+3. **Error Correction**: Implement coding schemes to handle larger noise without information leakage
+4. **Parameter Validation**: Ensure security parameters meet established cryptographic standards
 
 ---
 
-## 🛡️ How to Harden
+## 🎓 Learning Outcomes
 
-- Avoid a 0 vs \(q/4\) encoding that’s *too* separated unless the noise/secret spread is large enough.  
-- Use **wider secrets and input ranges** (not near-zero coefficients).  
-- Add **error-correcting codes** to tolerate larger noise without leaking trivially.  
-- Consider multi-level encodings (e.g., 4-ary) *with* adequate masking/noise.
+This challenge demonstrates:
 
----
-
-## 🔁 Reproduction Checklist
-
-1. Put `mistake.txt` at the repo root.  
-2. Run the Python script (Python ≥ 3.8).  
-3. Confirm the output starts with `ctf{…}`.
+- The critical importance of proper parameter selection in lattice-based cryptography
+- How implementation flaws can completely compromise theoretical security
+- The relationship between noise, signal separation, and security in LWE-based schemes
+- Practical cryptanalysis techniques for identifying and exploiting structural weaknesses
 
 ---
 
-*Made with ❤️ for CTFs. PRs welcome for a “hard” variant and a more general LWE solver!*
+## 📚 References
+
+- [Learning With Errors Problem](https://en.wikipedia.org/wiki/Learning_with_errors)
+- [Lattice-based Cryptography](https://en.wikipedia.org/wiki/Lattice-based_cryptography)
+- [Post-Quantum Cryptography Standards](https://csrc.nist.gov/projects/post-quantum-cryptography)
+
+---
+
+_This write-up is for educational purposes in cryptographic analysis and CTF problem solving._
