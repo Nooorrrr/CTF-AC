@@ -1,7 +1,7 @@
 ## Solution :
 
-Strated by reverse searching the image using google lense, and I came across this blog about mugs in balchik, however after looking more into the beaches there I realised that its the wrong place.  
-Then i cam across a reddit and a facebook posts with a picture of similair mugs and written next to it bulgaria,which allowed me to narrow it down to bulgaria.
+Strated by reverse searching the image using google lense, and I came across this blog about mugs in balchik : https://calinhera.com/2015/08/06/ceausescu-basescu-iohannis-balcic/ , however after looking more into the beaches there I realised that its the wrong place and that it must be somwehere else in bulgaria.
+Then i cam across a reddit and a facebook posts with a picture of similair mugs which allowed me to confirm that it's in bulgaria.
 ![1](image.png)
 
 ![2](image2.png)
