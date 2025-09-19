@@ -123,29 +123,3 @@ CTF{9fb64c8a4d81f9d0e1f4108467bee58db112d0d1457fa3716cc6a46231803686}
 3. **Arbitrary code execution** - `init.py` runs with server privileges
 4. **No sandboxing** - Full access to server environment and filesystem
 5. **Environment variable exposure** - Sensitive data accessible to plugin code
-
-## Alternative Exploitation Methods
-
-Since we have RCE, other potential attacks include:
-
-1. **File system access:**
-
-```python
-# Read server configuration files
-with open('/etc/passwd', 'r') as f:
-    content = f.read()
-```
-
-2. **Network reconnaissance:**
-
-```python
-import subprocess
-result = subprocess.run(['netstat', '-an'], capture_output=True, text=True)
-```
-
-3. **Reverse shell:**
-
-```python
-import socket, subprocess, os
-# Reverse shell payload
-```
