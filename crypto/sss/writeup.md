@@ -1,0 +1,2 @@
+## Solution : 
+The name of the challenge and the word ```Shamir``` hints that it's about the Shamir Secret Sharing methode, I was able to reconstruct the secret with theuse of this websit : https://iancoleman.io/shamir/
