@@ -9,7 +9,7 @@
 
 VC Portal is a web application that allows users to upload "arcade-grade analytics widgets" in the form of `.plugin` files. The challenge involves exploiting the plugin upload mechanism to achieve remote code execution and extract environment variables containing the flag.
 
-![VC Portal Interface](C:\Users\hp\Desktop\CTF@AC\web\money\image1.png)
+![VC Portal Interface](image1.png)
 
 ## Challenge Analysis
 
@@ -106,7 +106,7 @@ The challenge includes a `reveal_envflag.plugin` file. When uploaded, this plugi
    - Click on the widget to navigate to `/widget/<uuid>`
    - The generated page displays the flag directly
 
-![C:\Users\hp\Desktop\CTF@AC\web\money\image2.png](C:\Users\hp\Desktop\CTF@AC\web\money\image2.png)
+![Flag Display](image2.png)
 
 ### Step 4: Flag Extraction
 
