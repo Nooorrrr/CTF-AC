@@ -320,29 +320,4 @@ python3 solve.py --host ctf.ac.upt.ro --port 9280
 
 ---
 
----
-
-## **🔑 Key Takeaways**
-
-### **Vulnerability Analysis**
-
-1. **Keystream Reuse**: The same keystream was used for multiple messages
-2. **Known Plaintext**: One message contained a predictable pattern ("LOL" repeated)
-3. **Weak Cipher**: Additive cipher without proper key management
-
-### **Attack Techniques Used**
-
-1. **Crib-dragging**: Using known plaintext to recover the keystream
-2. **Two-time pad attack**: Exploiting keystream reuse
-3. **Pattern recognition**: Identifying the repeated "LOL" pattern
-
-### **Security Lessons**
-
-- **Never reuse stream cipher keys/keystreams**
-- **Avoid predictable plaintexts** in cryptographic systems
-- **Implement proper key derivation** and management
-- **Use authenticated encryption** when possible
-
----
-
 **Final Flag:** `**CTF{d2e233c8aaa37f0cea948ae5e8d599c0c88d3be4acc3d89b7ad5c1bae8f612fb}**`
