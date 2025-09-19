@@ -99,31 +99,6 @@ After testing various system files, I returned to check common flag locations mo
 
 #### Final Successful Attempt: `/app/server/flag.txt`
 
-```rust
-principal() {}
-compile_error!(include_str!("/app/server/flag.txt"));
-```
-
-**Result:** Success! The flag was actually in the first path I tried, but I initially missed it in the cryptographic hash error message.
-
-![Flag found](image1.png)
-
-Looking more carefully at the error output, the flag was embedded within the compilation error message!
-
-## Key Techniques Used
-
-1. **Compile-time File Inclusion**: Using `include_str!()` to read files at compilation time
-2. **Error-based Information Disclosure**: Using `compile_error!()` to display file contents in error messages
-3. **Linux File System Knowledge**: Understanding common locations for sensitive files (`/etc/passwd`, `/etc/shadow`, `/proc/*/environ`)
-
-## Flag
-
-The flag was found in `/app/server/flag.txt` and was embedded in the compilation error message:
-
-**Flag:** `ctf{73523e676b04e1c2db176d80356488936480969f5ddf5ac40f8fc5b6c15d8692}`
-
-## Conclusion
-
 This challenge demonstrated how a seemingly harmless "compiler" interface can be exploited to read arbitrary files from the server filesystem. The key was understanding that Rust-like syntax could be used with `compile_error!` and `include_str!` to turn compilation errors into an information disclosure vector.
 
 The solution path involved:
