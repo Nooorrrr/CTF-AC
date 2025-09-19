@@ -172,6 +172,8 @@ Based on the provided screenshot, here's what happens during execution:
 5. **Decryption**: Use derived key to decrypt the flag
 6. **Result**: `CTF{55ba4939edd5611a7ab797529b51dae47989b3c5a99f2ffc82e4b2c74d03e56}`
 
+![Flag Display](image.png)
+
 ## Flag
 
 ```

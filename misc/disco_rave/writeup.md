@@ -185,6 +185,8 @@ python solve.py snowflake
 
 Input the encrypted flag and message data when prompted.
 
+![Flag Display](image.png)
+
 ## Final Result
 
 ```
