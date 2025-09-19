@@ -106,7 +106,7 @@ The challenge includes a `reveal_envflag.plugin` file. When uploaded, this plugi
    - Click on the widget to navigate to `/widget/<uuid>`
    - The generated page displays the flag directly
 
-![Flag Display](C:\Users\hp\Desktop\CTF@AC\web\money\image2.png)
+![C:\Users\hp\Desktop\CTF@AC\web\money\image2.png](C:\Users\hp\Desktop\CTF@AC\web\money\image2.png)
 
 ### Step 4: Flag Extraction
 
