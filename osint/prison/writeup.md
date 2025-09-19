@@ -68,13 +68,3 @@ Final Answer
 
 Flag:
 CTF{play.thepen-mc.net:Leaky_Tandos}
-
-Key OSINT Skills Used
-
-Visual clues from the screenshot (names, titles, Discord mention).
-
-Search engine queries combining names with “minecraft prison server.”
-
-Server listing websites to confirm the host/IP.
-
-Forum digging to reveal the full owner username.

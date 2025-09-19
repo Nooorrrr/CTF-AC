@@ -52,7 +52,7 @@ The riddle text mentions:
 
 This fits perfectly with the geography of Kelheim.
 
-🏆 Step 5 — Build the Flag
+Step 5 — Build the Flag
 
 Following the required flag format:
 CTF{Kelheim}
